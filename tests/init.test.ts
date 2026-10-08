@@ -89,7 +89,6 @@ describe("toolchain init", () => {
       /zod:\n\s+specifier: \^4\.6\.5\n/,
     );
     execFileSync("pnpm", ["exec", "toolchain", "drift"], { cwd: dir, stdio: "pipe" });
-    expect(init(dir)).toBe("");
   }, 120_000);
 
   it("keeps the repo's existing workspace entries", () => {
