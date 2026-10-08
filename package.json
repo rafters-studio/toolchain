@@ -1,6 +1,6 @@
 {
   "name": "@rafters/toolchain",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "One toolchain for every rafters-studio TypeScript repo: a shared pnpm catalog, BDD tooling, and a reusable CI workflow.",
   "homepage": "https://github.com/rafters-studio/toolchain#readme",
   "bugs": {
