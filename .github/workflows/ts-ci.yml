@@ -1,0 +1,54 @@
+name: TypeScript CI
+
+# Reusable CI for rafters-studio TypeScript repos:
+#   jobs:
+#     ci:
+#       uses: rafters-studio/toolchain/.github/workflows/ts-ci.yml@main
+on:
+  workflow_call:
+    inputs:
+      migratr-rev:
+        description: A migratr commit to install before the tests. Empty installs nothing.
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6.0.10
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24.12
+          cache: pnpm
+      # migratr is unreleased, so it is built at the pinned commit and cached by that commit.
+      - uses: actions/cache@v4
+        if: inputs.migratr-rev != ''
+        id: migratr
+        with:
+          path: ~/.cargo-migratr
+          key: migratr-${{ inputs.migratr-rev }}
+      - name: Fetch migratr
+        if: inputs.migratr-rev != '' && steps.migratr.outputs.cache-hit != 'true'
+        uses: actions/checkout@v5
+        with:
+          repository: rafters-studio/migratr
+          ref: ${{ inputs.migratr-rev }}
+          path: .migratr-src
+      - name: Install migratr
+        if: inputs.migratr-rev != '' && steps.migratr.outputs.cache-hit != 'true'
+        run: cargo install --locked --path .migratr-src/crates/migratr-cli --root ~/.cargo-migratr
+      - name: Put migratr on PATH
+        if: inputs.migratr-rev != ''
+        run: echo "$HOME/.cargo-migratr/bin" >> "$GITHUB_PATH"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec toolchain drift
+      - run: pnpm exec vp check
+      - run: pnpm exec vp test
+      - run: pnpm exec cucumber-js
+      - run: pnpm run build

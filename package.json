@@ -1,0 +1,76 @@
+{
+  "name": "@rafters/toolchain",
+  "version": "0.1.0",
+  "description": "One toolchain for every rafters-studio TypeScript repo: a shared pnpm catalog, BDD tooling, and a reusable CI workflow.",
+  "homepage": "https://github.com/rafters-studio/toolchain#readme",
+  "bugs": {
+    "url": "https://github.com/rafters-studio/toolchain/issues"
+  },
+  "license": "MIT",
+  "author": "Sean Silvius",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafters-studio/toolchain.git"
+  },
+  "bin": {
+    "toolchain": "./bin/toolchain.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "pnpmfile.mjs",
+    "pnpmfile.d.mts"
+  ],
+  "type": "module",
+  "exports": {
+    "./cucumber": "./src/cucumber.ts",
+    "./pnpmfile.mjs": {
+      "types": "./pnpmfile.d.mts",
+      "default": "./pnpmfile.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      "./cucumber": {
+        "types": "./dist/cucumber.d.mts",
+        "default": "./dist/cucumber.mjs"
+      },
+      "./pnpmfile.mjs": {
+        "types": "./pnpmfile.d.mts",
+        "default": "./pnpmfile.mjs"
+      },
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check",
+    "bdd": "cucumber-js",
+    "prepublishOnly": "vp run build",
+    "prepare": "vp config"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "catalog:"
+  },
+  "devDependencies": {
+    "@rafters/release": "catalog:",
+    "@rafters/toolchain": "link:.",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.9.1",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

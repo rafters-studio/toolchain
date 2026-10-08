@@ -1,0 +1,8 @@
+{
+  "name": "fixture-workspace",
+  "private": true,
+  "dependencies": {
+    "@types/node": "catalog:",
+    "zod": "catalog:"
+  }
+}
