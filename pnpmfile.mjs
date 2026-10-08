@@ -5,6 +5,7 @@
 export const catalog = {
   "@cloudflare/workers-types": "^5.20261004.1",
   "@cucumber/cucumber": "^12.0.0",
+  "@rafters/release": "^0.1.2",
   "@types/node": "^24",
   typescript: "^7.0.2",
   vite: "npm:@voidzero-dev/vite-plus-core@1.0.0",

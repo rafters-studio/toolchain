@@ -1,9 +1,12 @@
+import { readFileSync } from "node:fs";
 import { DEV_ENGINES_PIN, findDrift } from "./drift.ts";
 import { writeFeature } from "./features.ts";
+import { init } from "./init.ts";
 
 const USAGE = `usage:
   toolchain features <requirement-id> <feature path>
-  toolchain drift`;
+  toolchain drift
+  toolchain init`;
 
 function main(argv: string[]): number {
   const [command, ...args] = argv;
@@ -26,6 +29,11 @@ function main(argv: string[]): number {
       );
     }
     return drift.length === 0 ? 0 : 1;
+  }
+  if (command === "init") {
+    const own = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+    for (const line of init(process.cwd(), own)) console.log(line);
+    return 0;
   }
   console.error(USAGE);
   return 2;

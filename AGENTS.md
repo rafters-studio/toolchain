@@ -16,7 +16,8 @@ Toolchain: Vite+ (`vp`). Run `vp install` after pulling, and `vp check` and `vp 
 ## Layout
 
 - `pnpmfile.mjs`: the shipped catalog and its `updateConfig` hook. The catalog also lives in this repo's `pnpm-workspace.yaml`, because the repo cannot read its own config dependency; `tests/pnpmfile.test.ts` keeps the two equal. Change a version in both.
-- `src/cli.ts`: the `toolchain` bin (`features`, `drift`). `bin/toolchain.mjs` runs the built `dist/cli.mjs`, or `src/cli.ts` before the first build (CI runs `toolchain drift` ahead of the build).
+- `src/cli.ts`: the `toolchain` bin (`features`, `drift`, `init`). `bin/toolchain.mjs` runs the built `dist/cli.mjs`, or `src/cli.ts` before the first build (CI runs `toolchain drift` ahead of the build).
+- `src/init.ts`: `toolchain init`, which makes a workspace a consumer.
 - `src/cucumber.ts`: the Cucumber.js preset, exported as `@rafters/toolchain/cucumber`.
 - `.github/workflows/ts-ci.yml`: the reusable CI workflow. This repo's `ci.yml` calls it.
 

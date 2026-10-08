@@ -51,4 +51,10 @@ jobs:
       - run: pnpm exec vp check
       - run: pnpm exec vp test
       - run: pnpm exec cucumber-js
-      - run: pnpm run build
+      - name: Build
+        run: |
+          if node -e 'process.exit(require("./package.json").scripts?.build ? 0 : 1)'; then
+            pnpm run build
+          else
+            echo "Skipping the build: the root package.json has no build script."
+          fi
