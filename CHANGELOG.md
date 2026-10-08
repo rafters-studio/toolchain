@@ -1,7 +1,8 @@
 # toolchain
 
-## Unreleased
+## 0.1.3
 
+- `toolchain init`'s integration test installs a published toolchain version, so it no longer needs its own version published first. (#13)
 - `toolchain init` keeps the repo's pnpm pin, upgrades an existing toolchain pin, and excludes the toolchain from the release-age check. (#15)
 
 ## 0.1.2
