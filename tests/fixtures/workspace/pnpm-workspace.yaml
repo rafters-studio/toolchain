@@ -1,0 +1,5 @@
+catalogMode: strict
+
+# The fixture sets @types/node itself; zod comes from the toolchain.
+catalog:
+  "@types/node": ^22
