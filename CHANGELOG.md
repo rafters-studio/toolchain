@@ -1,5 +1,9 @@
 # toolchain
 
+## Unreleased
+
+- `toolchain init` keeps the repo's pnpm pin, upgrades an existing toolchain pin, and excludes the toolchain from the release-age check. (#15)
+
 ## 0.1.2
 
 - `toolchain init` adopts the toolchain in a repo with one command. (#9)
