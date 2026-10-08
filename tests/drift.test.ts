@@ -83,6 +83,15 @@ describe("toolchain drift", () => {
     expect(findDrift(root).map((d) => d.file)).toEqual(["packages/a/package.json"]);
   });
 
+  it("honours ! patterns that match below the directory, as pnpm does", () => {
+    const pin = { dependencies: { zod: "^4.0.0" } };
+    const root = workspace(
+      { ".": {}, "packages/a": pin, "packages/a/test": pin, "packages/skip": pin },
+      ["packages/**", "!**/test/**", "!packages/skip/**"],
+    );
+    expect(findDrift(root).map((d) => d.file)).toEqual(["packages/a/package.json"]);
+  });
+
   it("checks only the root without a pnpm-workspace.yaml", () => {
     const pin = { dependencies: { zod: "^4.0.0" } };
     expect(findDrift(workspace({ ".": pin, "packages/a": pin })).map((d) => d.file)).toEqual([

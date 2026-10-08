@@ -45,7 +45,12 @@ function packageJsonFiles(root: string): string[] {
     for (const dir of globSync(clean(glob), { cwd: root })) {
       const rel = dir.split(sep).join("/");
       if (rel.split("/").includes("node_modules")) continue;
-      if (excluded.some((e) => posix.matchesGlob(rel, e))) continue;
+      if (
+        excluded.some(
+          (e) => posix.matchesGlob(rel, e) || posix.matchesGlob(`${rel}/package.json`, e),
+        )
+      )
+        continue;
       const file = join(root, dir, "package.json");
       if (existsSync(file)) files.add(file);
     }
