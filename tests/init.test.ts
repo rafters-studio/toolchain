@@ -40,6 +40,19 @@ describe("toolchain init", () => {
   it("yields a workspace where pnpm install applies the catalog and drift runs", () => {
     const dir = fixture();
     init(dir);
+    // pnpm fetches config dependencies from the registry, so install a version
+    // that exists on npm rather than this repo's own, possibly unpublished, one.
+    const published = execFileSync("pnpm", ["view", "@rafters/toolchain", "version"], {
+      cwd: dir,
+      encoding: "utf8",
+    }).trim();
+    const workspace = join(dir, "pnpm-workspace.yaml");
+    writeFileSync(
+      workspace,
+      readFileSync(workspace, "utf8")
+        .replace(`"@rafters/toolchain": ${own.version}`, `"@rafters/toolchain": ${published}`)
+        .replace(`"@rafters/toolchain": ^${own.version}`, `"@rafters/toolchain": ^${published}`),
+    );
     execFileSync("pnpm", ["install"], { cwd: dir, stdio: "pipe" });
     expect(readFileSync(join(dir, "pnpm-lock.yaml"), "utf8")).toMatch(
       /zod:\n\s+specifier: \^4\.6\.5\n/,
