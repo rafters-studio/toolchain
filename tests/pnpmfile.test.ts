@@ -14,6 +14,7 @@ describe("pnpmfile updateConfig", () => {
     expect(Object.keys(catalog).sort()).toEqual([
       "@cloudflare/workers-types",
       "@cucumber/cucumber",
+      "@rafters/release",
       "@types/node",
       "typescript",
       "vite",

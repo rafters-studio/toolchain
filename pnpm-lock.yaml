@@ -168,8 +168,8 @@ catalogs:
       specifier: ^12.0.0
       version: 12.9.0
     '@rafters/release':
-      specifier: ^0.1.1
-      version: 0.1.1
+      specifier: ^0.1.2
+      version: 0.1.2
     '@types/node':
       specifier: ^24
       version: 24.19.1
@@ -193,7 +193,7 @@ importers:
     devDependencies:
       '@rafters/release':
         specifier: 'catalog:'
-        version: 0.1.1
+        version: 0.1.2
       '@rafters/toolchain':
         specifier: link:.
         version: 'link:'
@@ -584,8 +584,8 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
-  '@rafters/release@0.1.1':
-    resolution: {integrity: sha512-unmz7plD0Y0Q9vnGy+FrSbWZcDapnNXT+weKN3ueyUMX/ZZGNKCPMa639ce7A5cdEzkK+dfkPTVw4Gimz+lJ2g==}
+  '@rafters/release@0.1.2':
+    resolution: {integrity: sha512-JBq7+QCgl6blrx4v7qnERSGk9y2hNkBrdgUxAxcyqToAKuBzWsBYJiMvpEmTIfVBW+sBgS318UX3JnN6p8OP0w==}
     engines: {node: '>=22.18.0'}
     hasBin: true
 
@@ -2008,7 +2008,7 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@rafters/release@0.1.1': {}
+  '@rafters/release@0.1.2': {}
 
   '@teppeis/multimaps@3.0.0': {}
 
