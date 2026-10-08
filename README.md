@@ -29,7 +29,7 @@ export { default } from "@rafters/toolchain/cucumber";
 The `toolchain` bin:
 
 - `toolchain features <requirement-id> <feature path>` writes a legion requirement's scenarios to a Gherkin feature file.
-- `toolchain drift` exits non-zero, naming each file and package, when a `package.json` pins a managed package instead of using `catalog:`.
+- `toolchain drift` exits non-zero, naming each file and package, when a workspace `package.json` (the root and the packages `pnpm-workspace.yaml` lists) pins a managed package instead of using `catalog:`.
 
 CI, in `.github/workflows/ci.yml`:
 

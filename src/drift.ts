@@ -1,9 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { existsSync, globSync, readFileSync } from "node:fs";
+import { join, posix, relative, sep } from "node:path";
 import { catalog } from "../pnpmfile.mjs";
 
 const SECTIONS = ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"];
-const SKIPPED_DIRS = new Set(["node_modules", ".git", "dist"]);
 
 export interface Drift {
   file: string;
@@ -11,16 +10,47 @@ export interface Drift {
   spec: string;
 }
 
-function packageJsonFiles(dir: string): string[] {
-  const found: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory() && !SKIPPED_DIRS.has(entry.name)) {
-      found.push(...packageJsonFiles(join(dir, entry.name)));
-    } else if (entry.isFile() && entry.name === "package.json") {
-      found.push(join(dir, entry.name));
+/** The `packages:` globs of pnpm-workspace.yaml; an absent file or key means no workspace packages. */
+function workspaceGlobs(root: string): string[] {
+  let text: string;
+  try {
+    text = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
+  } catch {
+    return [];
+  }
+  const globs: string[] = [];
+  let inPackages = false;
+  for (const line of text.split(/\r?\n/)) {
+    if (/^packages\s*:/.test(line)) {
+      inPackages = true;
+    } else if (/^\S/.test(line)) {
+      inPackages = false;
+    } else if (inPackages) {
+      const item = /^\s*-\s*(?:"([^"]*)"|'([^']*)'|([^#\s][^#]*?))\s*(?:#.*)?$/.exec(line);
+      const glob = item?.[1] ?? item?.[2] ?? item?.[3];
+      if (glob) globs.push(glob);
     }
   }
-  return found;
+  return globs;
+}
+
+const clean = (glob: string) => glob.replace(/^\.\//, "").replace(/\/+$/, "");
+
+/** The root package.json plus every package the workspace globs match, `!` patterns excluding as pnpm does. */
+function packageJsonFiles(root: string): string[] {
+  const globs = workspaceGlobs(root);
+  const excluded = globs.filter((g) => g.startsWith("!")).map((g) => clean(g.slice(1)));
+  const files = new Set([join(root, "package.json")]);
+  for (const glob of globs.filter((g) => !g.startsWith("!"))) {
+    for (const dir of globSync(clean(glob), { cwd: root })) {
+      const rel = dir.split(sep).join("/");
+      if (rel.split("/").includes("node_modules")) continue;
+      if (excluded.some((e) => posix.matchesGlob(rel, e))) continue;
+      const file = join(root, dir, "package.json");
+      if (existsSync(file)) files.add(file);
+    }
+  }
+  return [...files];
 }
 
 /** Every managed package a package.json in the workspace pins to something other than `catalog:`. */
