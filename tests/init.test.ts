@@ -30,9 +30,40 @@ describe("toolchain init", () => {
     const first = files(dir);
     const manifest = JSON.parse(first[1]);
     expect(manifest.devDependencies["@rafters/toolchain"]).toBe("catalog:");
-    expect(manifest.packageManager).toBe(own.packageManager);
+    expect(manifest.packageManager).toBe("pnpm@12.9.1");
     expect(first[0]).toContain(".pnpm-config/@rafters/toolchain/pnpmfile.mjs");
     expect(first[2]).toContain(`configDependencies:\n  "@rafters/toolchain": ${own.version}`);
+    expect(init(dir)).toBe("");
+    expect(files(dir)).toEqual(first);
+  });
+
+  it("keeps an existing packageManager pin", () => {
+    const dir = fixture();
+    writeFileSync(
+      join(dir, "package.json"),
+      JSON.stringify({ name: "p", packageManager: "pnpm@12.8.0" }),
+    );
+    init(dir);
+    expect(JSON.parse(files(dir)[1]).packageManager).toBe("pnpm@12.8.0");
+  });
+
+  it("upgrades an existing 0.1.1 pin in all three places and excludes it from the release-age rule", () => {
+    const dir = fixture();
+    writeFileSync(
+      join(dir, "package.json"),
+      JSON.stringify({ name: "p", devDependencies: { "@rafters/toolchain": "catalog:" } }),
+    );
+    writeFileSync(
+      join(dir, "pnpm-workspace.yaml"),
+      'configDependencies:\n  "@rafters/toolchain": 0.1.1\ncatalog:\n  "@rafters/toolchain": ^0.1.1\nminimumReleaseAgeExclude:\n  - "@rafters/release@0.1.2"\n',
+    );
+    init(dir);
+    const first = files(dir);
+    expect(first[2]).toContain(`configDependencies:\n  "@rafters/toolchain": ${own.version}\n`);
+    expect(first[2]).toContain(`catalog:\n  "@rafters/toolchain": ^${own.version}\n`);
+    expect(first[2]).not.toContain("0.1.1\n");
+    expect(first[2]).toContain('  - "@rafters/toolchain"\n');
+    expect(first[2]).toContain('  - "@rafters/release@0.1.2"');
     expect(init(dir)).toBe("");
     expect(files(dir)).toEqual(first);
   });
