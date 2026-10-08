@@ -1,4 +1,4 @@
-import { findDrift } from "./drift.ts";
+import { DEV_ENGINES_PIN, findDrift } from "./drift.ts";
 import { writeFeature } from "./features.ts";
 
 const USAGE = `usage:
@@ -19,7 +19,11 @@ function main(argv: string[]): number {
   if (command === "drift") {
     const drift = findDrift(process.cwd());
     for (const d of drift) {
-      console.error(`${d.file}: ${d.package} is pinned to ${d.spec}, use catalog:`);
+      console.error(
+        d.package === DEV_ENGINES_PIN
+          ? `${d.file}: devEngines.packageManager pins pnpm, which makes npm 11 fail with EBADDEVENGINES; use "packageManager": "pnpm@<version>"`
+          : `${d.file}: ${d.package} is pinned to ${d.spec}, use catalog:`,
+      );
     }
     return drift.length === 0 ? 0 : 1;
   }

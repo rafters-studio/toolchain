@@ -106,6 +106,27 @@ describe("toolchain drift", () => {
     expect(findDrift(root)).toEqual([]);
   });
 
+  it("fails a root that pins pnpm through devEngines and says to use packageManager", () => {
+    const root = workspace({
+      ".": {
+        devEngines: { packageManager: { name: "pnpm", version: "12.9.1", onFail: "download" } },
+      },
+    });
+    expect(findDrift(root)).toEqual([
+      { file: "package.json", package: "devEngines.packageManager", spec: "pnpm" },
+    ]);
+    const result = spawnSync("node", [bin, "drift"], { cwd: root, encoding: "utf8" });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("package.json");
+    expect(result.stderr).toContain('"packageManager": "pnpm@<version>"');
+  });
+
+  it("passes a root that pins pnpm with the packageManager field", () => {
+    const root = workspace({ ".": { packageManager: "pnpm@12.9.1" } });
+    expect(findDrift(root)).toEqual([]);
+    expect(spawnSync("node", [bin, "drift"], { cwd: root }).status).toBe(0);
+  });
+
   it("passes this repo", () => {
     expect(findDrift(fileURLToPath(new URL("..", import.meta.url)))).toEqual([]);
   });
