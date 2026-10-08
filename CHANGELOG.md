@@ -1,5 +1,11 @@
 # toolchain
 
+## 0.1.2
+
+- `toolchain init` adopts the toolchain in a repo with one command. (#9)
+- `ts-ci.yml` skips the build when a repo has no build script. (#9)
+- `@rafters/release` is in the shared catalog. (#9)
+
 ## 0.1.1
 
 - `toolchain drift` checks only the workspace's own packages, with exclusions that match pnpm's `package.json` path forms. (#3)
