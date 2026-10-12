@@ -23,6 +23,14 @@ A config dependency does not link its bin, so the devDependency is what lets `pn
 
 Then write `catalog:` for `vite-plus`, `vite`, `typescript`, `zod`, `wrangler`, `@cloudflare/workers-types`, `@cucumber/cucumber`, `@rafters/release` and `@types/node`. An entry your own `pnpm-workspace.yaml` sets stays yours.
 
+## astro check
+
+The catalog's `typescript` is 7, the native compiler. `astro check` cannot run on it: `@astrojs/check` loads `typescript` from its own location and drives TypeScript's programmatic API, which TypeScript 7 does not ship. The toolchain's `readPackage` hook gives `@astrojs/check` a dependency of its own on TypeScript `^6.0.3` (`astroCheckTypescript` in `pnpmfile.mjs`) in place of its `typescript` peer. `astro check` then runs on TypeScript 6 while the rest of the repo, `tsc` included, stays on the catalog's 7. A repo needs no `typescript` entry of its own for this; drop any `typescript: ^5.9.3` kept for `astro check`.
+
+The hook changes the pnpmfile checksum pnpm records in the lockfile, so after upgrading to a toolchain version that changes the hooks, run `pnpm install` once; `pnpm install --frozen-lockfile` fails until the lockfile is regenerated.
+
+Declaration emit is separate. On TypeScript 7 that is `vp pack` with `dts.generator: "tsgo"`; tsup's `.d.ts` step fails on 7, and this hook does not change that.
+
 ## Upgrading
 
 Run `toolchain init` again with the newer toolchain. It moves the `@rafters/toolchain` entries to its own version and excludes the package from pnpm's release-age check, so the install that follows passes.

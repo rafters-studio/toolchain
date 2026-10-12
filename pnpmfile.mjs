@@ -14,10 +14,25 @@ export const catalog = {
   zod: "^4.6.5",
 };
 
+// The TypeScript `astro check` runs on. @astrojs/check resolves `typescript` from its own location and
+// drives TypeScript's programmatic API, which the native compiler (7.0 and later) does not ship. Its
+// peer would resolve to the consumer's catalog TypeScript, so readPackage turns that peer into a
+// dependency of its own, and the rest of the repo stays on the catalog's version.
+export const astroCheckTypescript = "^6.0.3";
+
 export const hooks = {
   // The consumer's own default-catalog entries win over the toolchain's.
   updateConfig(config) {
     const catalogs = config.catalogs ?? {};
     return { ...config, catalogs: { ...catalogs, default: { ...catalog, ...catalogs.default } } };
+  },
+  readPackage(pkg) {
+    if (pkg.name !== "@astrojs/check") return pkg;
+    const { typescript: _peer, ...peerDependencies } = pkg.peerDependencies ?? {};
+    return {
+      ...pkg,
+      peerDependencies,
+      dependencies: { ...pkg.dependencies, typescript: astroCheckTypescript },
+    };
   },
 };
