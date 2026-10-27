@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
-import { catalog, hooks } from "../pnpmfile.mjs";
+import { astroCheckTypescript, catalog, hooks } from "../pnpmfile.mjs";
 
 const pnpmfile = fileURLToPath(new URL("../pnpmfile.mjs", import.meta.url));
 
@@ -43,6 +43,23 @@ describe("pnpmfile updateConfig", () => {
   });
 });
 
+describe("pnpmfile readPackage", () => {
+  it("gives @astrojs/check its own typescript in place of the peer", () => {
+    const pkg = hooks.readPackage({
+      name: "@astrojs/check",
+      dependencies: { kleur: "^4.1.5" },
+      peerDependencies: { typescript: "^5.0.0 || ^6.0.0" },
+    });
+    expect(pkg.dependencies).toEqual({ kleur: "^4.1.5", typescript: astroCheckTypescript });
+    expect(pkg.peerDependencies).toEqual({});
+  });
+
+  it("leaves every other package alone", () => {
+    const manifest = { name: "tsconfck", peerDependencies: { typescript: "^5.0.0" } };
+    expect(hooks.readPackage(manifest)).toBe(manifest);
+  });
+});
+
 describe("pnpm install in a fixture workspace", () => {
   it("resolves catalog: to the toolchain's version and keeps the fixture's own", () => {
     const dir = mkdtempSync(join(tmpdir(), "toolchain-ws-"));
@@ -58,5 +75,17 @@ describe("pnpm install in a fixture workspace", () => {
     const lock = readFileSync(join(dir, "pnpm-lock.yaml"), "utf8");
     expect(lock).toMatch(/zod:\n\s+specifier: \^4\.6\.5\n/);
     expect(lock).toMatch(/'@types\/node':\n\s+specifier: \^22\n/);
+    // The workspace stays on the catalog's typescript; astro check gets its own.
+    const major = (range: string) => range.replace(/^\D*/, "").split(".")[0];
+    expect(lock).toMatch(
+      new RegExp(
+        ` typescript:\n\\s+specifier: 'catalog:'\n\\s+version: ${major(catalog.typescript)}\\.`,
+      ),
+    );
+    expect(lock).toMatch(
+      new RegExp(
+        `'@astrojs/check@[^']+':\n\\s+dependencies:\n(?:\\s+.+\n)*?\\s+typescript: ${major(astroCheckTypescript)}\\.`,
+      ),
+    );
   }, 120_000);
 });
