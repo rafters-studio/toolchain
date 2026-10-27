@@ -29,6 +29,8 @@ The catalog's `typescript` is 7, the native compiler. `astro check` cannot run o
 
 The hook changes the pnpmfile checksum pnpm records in the lockfile, so after upgrading to a toolchain version that changes the hooks, run `pnpm install` once; `pnpm install --frozen-lockfile` fails until the lockfile is regenerated.
 
+Dropping that override moves `tsc` itself to TypeScript 7, which removed `baseUrl` (TS5102) and accepts only `paths` entries that start with `./` (TS5090). In each `tsconfig.json`, delete `"baseUrl": "."` and write `"@/*": ["src/*"]` as `"@/*": ["./src/*"]`. With `baseUrl` at `.` this resolves exactly as before, TypeScript 5 accepts it too, and `astro build` still resolves the aliases.
+
 Declaration emit is separate. On TypeScript 7 that is `vp pack` with `dts.generator: "tsgo"`; tsup's `.d.ts` step fails on 7, and this hook does not change that.
 
 ## Upgrading
