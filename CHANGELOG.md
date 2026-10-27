@@ -1,5 +1,10 @@
 # toolchain
 
+## 0.1.4
+
+- `astro check` runs alongside the catalog's TypeScript 7: the `readPackage` hook gives `@astrojs/check` its own TypeScript 6 in place of its `typescript` peer, so a repo needs no `typescript` override of its own. After upgrading, run `pnpm install` once to regenerate the lockfile. (#22)
+- The README gives the `astro sync && astro-check` script for Astro 7.4 and later, whose `astro check` command refuses TypeScript 7 before the hook can help, and the tsconfig change TypeScript 7 requires: no `baseUrl`, and `paths` starting with `./`. (#22)
+
 ## 0.1.3
 
 - `toolchain init`'s integration test installs a published toolchain version, so it no longer needs its own version published first. (#13)
