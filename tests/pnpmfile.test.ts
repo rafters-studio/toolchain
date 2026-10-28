@@ -4,13 +4,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
-import { astroCheckTypescript, catalog, hooks } from "../pnpmfile.mjs";
+import { astroCheckTypescript, catalog, catalogs, hooks } from "../pnpmfile.mjs";
 
 const pnpmfile = fileURLToPath(new URL("../pnpmfile.mjs", import.meta.url));
 
 describe("pnpmfile updateConfig", () => {
-  it("adds the managed packages as the default catalog", () => {
-    expect(hooks.updateConfig({}).catalogs).toEqual({ default: catalog });
+  it("adds the managed packages as the default catalog, and ts6 as a named one", () => {
+    expect(hooks.updateConfig({}).catalogs).toEqual({ default: catalog, ...catalogs });
+    expect(catalogs.ts6?.typescript).toMatch(/^\^6\./);
     expect(Object.keys(catalog).sort()).toEqual([
       "@cloudflare/workers-types",
       "@cucumber/cucumber",
@@ -31,6 +32,16 @@ describe("pnpmfile updateConfig", () => {
     expect(config.catalogs?.default?.zod).toBe("^3.0.0");
     expect(config.catalogs?.default?.typescript).toBe(catalog.typescript);
     expect(config.catalogs?.peers).toEqual({ zod: ">=3" });
+  });
+
+  it("keeps a consumer's own ts6 entry over the toolchain's", () => {
+    const config = hooks.updateConfig({ catalogs: { ts6: { typescript: "6.0.0" } } });
+    expect(config.catalogs?.ts6?.typescript).toBe("6.0.0");
+    expect(config.catalogs?.default?.typescript).toBe(catalog.typescript);
+  });
+
+  it("gives astro check the same TypeScript as catalog:ts6", () => {
+    expect(astroCheckTypescript).toBe(catalogs.ts6?.typescript);
   });
 
   it("matches this repo's own catalog", () => {
@@ -80,6 +91,12 @@ describe("pnpm install in a fixture workspace", () => {
     expect(lock).toMatch(
       new RegExp(
         ` typescript:\n\\s+specifier: 'catalog:'\n\\s+version: ${major(catalog.typescript)}\\.`,
+      ),
+    );
+    // A package that opts in with catalog:ts6 gets TypeScript 6 in the same workspace.
+    expect(lock).toMatch(
+      new RegExp(
+        `packages/api-user:\\n\\s+devDependencies:\\n\\s+typescript:\\n\\s+specifier: '?catalog:ts6'?\\n\\s+version: ${major(catalogs.ts6?.typescript ?? "")}\\.`,
       ),
     );
     expect(lock).toMatch(

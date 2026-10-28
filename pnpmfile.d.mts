@@ -12,6 +12,8 @@ export interface PackageManifest {
 
 export const catalog: Readonly<Record<string, string>>;
 
+export const catalogs: Readonly<Record<string, Readonly<Record<string, string>>>>;
+
 export const astroCheckTypescript: string;
 
 export const hooks: {

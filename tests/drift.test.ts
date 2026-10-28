@@ -25,13 +25,19 @@ function workspace(manifests: Record<string, object>, packages?: string[]): stri
 }
 
 const clean = () =>
-  workspace({
-    ".": {
-      dependencies: { zod: "catalog:", "left-pad": "^1.3.0" },
-      devDependencies: { typescript: "catalog:" },
-      peerDependencies: { zod: "catalog:peers" },
+  workspace(
+    {
+      ".": {
+        dependencies: { zod: "catalog:", "left-pad": "^1.3.0" },
+        devDependencies: { typescript: "catalog:" },
+        peerDependencies: { zod: "catalog:peers" },
+      },
+      "packages/api-user": {
+        devDependencies: { typescript: "catalog:ts6" },
+      },
     },
-  });
+    ["packages/*"],
+  );
 
 const pinned = () =>
   workspace(

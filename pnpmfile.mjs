@@ -14,17 +14,26 @@ export const catalog = {
   zod: "^4.6.5",
 };
 
+// Named catalogs. `ts6` is TypeScript 6 for packages that drive TypeScript's programmatic API, which
+// the native compiler (7.0 and later) does not ship yet; a package opts in with "catalog:ts6". Both
+// majors stay standard until 7 ships that API.
+export const catalogs = {
+  ts6: { typescript: "^6.0.3" },
+};
+
 // The TypeScript `astro check` runs on. @astrojs/check resolves `typescript` from its own location and
-// drives TypeScript's programmatic API, which the native compiler (7.0 and later) does not ship. Its
-// peer would resolve to the consumer's catalog TypeScript, so readPackage turns that peer into a
-// dependency of its own, and the rest of the repo stays on the catalog's version.
-export const astroCheckTypescript = "^6.0.3";
+// drives the programmatic API, so its peer would resolve to the catalog's TypeScript 7. readPackage
+// turns that peer into a dependency on the ts6 version, and the rest of the repo stays on 7.
+export const astroCheckTypescript = catalogs.ts6.typescript;
 
 export const hooks = {
-  // The consumer's own default-catalog entries win over the toolchain's.
+  // The consumer's own entries win over the toolchain's, in the default catalog and the named ones.
   updateConfig(config) {
-    const catalogs = config.catalogs ?? {};
-    return { ...config, catalogs: { ...catalogs, default: { ...catalog, ...catalogs.default } } };
+    const own = config.catalogs ?? {};
+    const named = Object.fromEntries(
+      Object.entries(catalogs).map(([name, entries]) => [name, { ...entries, ...own[name] }]),
+    );
+    return { ...config, catalogs: { ...own, ...named, default: { ...catalog, ...own.default } } };
   },
   readPackage(pkg) {
     if (pkg.name !== "@astrojs/check") return pkg;
