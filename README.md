@@ -23,6 +23,10 @@ A config dependency does not link its bin, so the devDependency is what lets `pn
 
 Then write `catalog:` for `vite-plus`, `vite`, `typescript`, `zod`, `wrangler`, `@cloudflare/workers-types`, `@cucumber/cucumber`, `@rafters/release` and `@types/node`. An entry your own `pnpm-workspace.yaml` sets stays yours.
 
+## TypeScript 6 and 7
+
+Both majors are standard until TypeScript 7 ships its programmatic API. `catalog:` gives TypeScript 7, the native compiler, which is what `tsc` and type checking use. A package that imports `typescript` to drive the compiler itself, such as a code generator or a props reader, writes `"typescript": "catalog:ts6"` and gets TypeScript 6 in the same workspace. There is no need for a repo-wide override. The `ts6` catalog goes away once TypeScript 7 ships the API.
+
 ## astro check
 
 The catalog's `typescript` is 7, the native compiler. `astro check` cannot run on it: `@astrojs/check` loads `typescript` from its own location and drives TypeScript's programmatic API, which TypeScript 7 does not ship. The toolchain's `readPackage` hook gives `@astrojs/check` a dependency of its own on TypeScript `^6.0.3` (`astroCheckTypescript` in `pnpmfile.mjs`) in place of its `typescript` peer. `astro check` then runs on TypeScript 6 while the rest of the repo, `tsc` included, stays on the catalog's 7. A repo needs no `typescript` entry of its own for this; drop any `typescript: ^5.9.3` kept for `astro check`.

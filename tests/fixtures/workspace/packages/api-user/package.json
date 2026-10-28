@@ -1,0 +1,7 @@
+{
+  "name": "fixture-api-user",
+  "private": true,
+  "devDependencies": {
+    "typescript": "catalog:ts6"
+  }
+}
