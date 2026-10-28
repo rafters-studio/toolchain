@@ -1,5 +1,9 @@
 # toolchain
 
+## 0.1.5
+
+- TypeScript 6 is a standard version beside 7 until TypeScript 7 ships its programmatic API. `catalog:` gives 7. A package that drives the compiler API writes `"typescript": "catalog:ts6"` and gets 6 in the same workspace, so no repo-wide override is needed. `astro check` uses the same `ts6` version. (#26)
+
 ## 0.1.4
 
 - `astro check` runs alongside the catalog's TypeScript 7: the `readPackage` hook gives `@astrojs/check` its own TypeScript 6 in place of its `typescript` peer, so a repo needs no `typescript` override of its own. After upgrading, run `pnpm install` once to regenerate the lockfile. (#22)
