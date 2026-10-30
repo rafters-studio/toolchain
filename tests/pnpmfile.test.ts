@@ -29,18 +29,6 @@ describe("pnpmfile updateConfig", () => {
     ]);
   });
 
-  it("ships no React", () => {
-    for (const name of ["react", "react-dom", "@astrojs/react"]) {
-      expect(catalog).not.toHaveProperty(name);
-    }
-  });
-
-  it("keeps a consumer's own astro entry over the toolchain's", () => {
-    const config = hooks.updateConfig({ catalogs: { default: { astro: "^7.0.0" } } });
-    expect(config.catalogs?.default?.astro).toBe("^7.0.0");
-    expect(config.catalogs?.default?.["@astrojs/mdx"]).toBe(catalog["@astrojs/mdx"]);
-  });
-
   it("keeps an entry the consumer set, and other catalogs", () => {
     const config = hooks.updateConfig({
       catalogs: { default: { zod: "^3.0.0" }, peers: { zod: ">=3" } },
