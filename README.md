@@ -21,7 +21,7 @@ export { hooks } from "./node_modules/.pnpm-config/@rafters/toolchain/pnpmfile.m
 
 A config dependency does not link its bin, so the devDependency is what lets `pnpm exec toolchain drift` run.
 
-Then write `catalog:` for `vite-plus`, `vite`, `typescript`, `zod`, `wrangler`, `@cloudflare/workers-types`, `@cucumber/cucumber`, `@rafters/release` and `@types/node`. An entry your own `pnpm-workspace.yaml` sets stays yours.
+Then write `catalog:` for `vite-plus`, `vite`, `typescript`, `astro`, `@astrojs/check`, `@astrojs/cloudflare`, `@astrojs/mdx`, `zod`, `wrangler`, `@cloudflare/workers-types`, `@cucumber/cucumber`, `@rafters/release` and `@types/node`. An entry your own `pnpm-workspace.yaml` sets stays yours.
 
 ## TypeScript 6 and 7
 

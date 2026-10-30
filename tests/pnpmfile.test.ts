@@ -13,16 +13,32 @@ describe("pnpmfile updateConfig", () => {
     expect(hooks.updateConfig({}).catalogs).toEqual({ default: catalog, ...catalogs });
     expect(catalogs.ts6?.typescript).toMatch(/^\^6\./);
     expect(Object.keys(catalog).sort()).toEqual([
+      "@astrojs/check",
+      "@astrojs/cloudflare",
+      "@astrojs/mdx",
       "@cloudflare/workers-types",
       "@cucumber/cucumber",
       "@rafters/release",
       "@types/node",
+      "astro",
       "typescript",
       "vite",
       "vite-plus",
       "wrangler",
       "zod",
     ]);
+  });
+
+  it("ships no React", () => {
+    for (const name of ["react", "react-dom", "@astrojs/react"]) {
+      expect(catalog).not.toHaveProperty(name);
+    }
+  });
+
+  it("keeps a consumer's own astro entry over the toolchain's", () => {
+    const config = hooks.updateConfig({ catalogs: { default: { astro: "^7.0.0" } } });
+    expect(config.catalogs?.default?.astro).toBe("^7.0.0");
+    expect(config.catalogs?.default?.["@astrojs/mdx"]).toBe(catalog["@astrojs/mdx"]);
   });
 
   it("keeps an entry the consumer set, and other catalogs", () => {
