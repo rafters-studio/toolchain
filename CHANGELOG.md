@@ -1,5 +1,9 @@
 # toolchain
 
+## 0.1.6
+
+- The catalog carries Astro 7: `astro`, `@astrojs/check`, `@astrojs/cloudflare` and `@astrojs/mdx`. An Astro repo writes `catalog:` for them in place of its own versions. React stays out of the catalog. (#30)
+
 ## 0.1.5
 
 - TypeScript 6 is a standard version beside 7 until TypeScript 7 ships its programmatic API. `catalog:` gives 7. A package that drives the compiler API writes `"typescript": "catalog:ts6"` and gets 6 in the same workspace, so no repo-wide override is needed. `astro check` uses the same `ts6` version. (#26)
