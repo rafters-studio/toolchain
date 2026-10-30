@@ -13,10 +13,14 @@ describe("pnpmfile updateConfig", () => {
     expect(hooks.updateConfig({}).catalogs).toEqual({ default: catalog, ...catalogs });
     expect(catalogs.ts6?.typescript).toMatch(/^\^6\./);
     expect(Object.keys(catalog).sort()).toEqual([
+      "@astrojs/check",
+      "@astrojs/cloudflare",
+      "@astrojs/mdx",
       "@cloudflare/workers-types",
       "@cucumber/cucumber",
       "@rafters/release",
       "@types/node",
+      "astro",
       "typescript",
       "vite",
       "vite-plus",
